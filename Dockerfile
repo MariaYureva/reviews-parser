@@ -51,6 +51,6 @@ RUN cp .env.example .env \
 
 ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium
 
-EXPOSE 8000
+EXPOSE ${PORT:-8000}
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+CMD php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
