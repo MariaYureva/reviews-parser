@@ -36,10 +36,9 @@ RUN cp -r dist/. /app/backend/public/
 WORKDIR /app/backend
 RUN composer install --no-dev --optimize-autoloader
 
-# Install scraper dependencies (skip Playwright browser download — use system Chromium)
+# Install scraper dependencies + Playwright Chromium
 WORKDIR /app/backend/scraper
-ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-RUN npm ci
+RUN npm ci && npx playwright install chromium --with-deps
 
 # Configure Laravel
 WORKDIR /app/backend
@@ -48,8 +47,6 @@ RUN cp .env.example .env \
     && touch database/database.sqlite \
     && php artisan migrate --force \
     && php artisan db:seed --force
-
-ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium
 
 EXPOSE ${PORT:-8000}
 
