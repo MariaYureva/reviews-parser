@@ -5,11 +5,11 @@
       <form @submit.prevent="handleLogin">
         <div class="field">
           <label>Email</label>
-          <input v-model="email" type="email" required placeholder="admin@example.com" />
+          <input v-model="email" type="email" required placeholder="admin@example.com"/>
         </div>
         <div class="field">
           <label>Пароль</label>
-          <input v-model="password" type="password" required placeholder="••••••••" />
+          <input v-model="password" type="password" required placeholder="••••••••"/>
         </div>
         <p v-if="error" class="error">{{ error }}</p>
         <button type="submit" :disabled="loading">
@@ -21,9 +21,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
+import {ref} from 'vue'
+import {useRouter} from 'vue-router'
+import {useAuthStore} from '../stores/auth'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -58,27 +58,32 @@ async function handleLogin() {
   justify-content: center;
   background: #f5f5f5;
 }
+
 .auth-card {
   background: #fff;
   padding: 40px;
   border-radius: 12px;
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
 }
+
 h1 {
   margin: 0 0 24px;
   font-size: 24px;
 }
+
 .field {
   margin-bottom: 16px;
 }
+
 label {
   display: block;
   margin-bottom: 6px;
   font-size: 14px;
   color: #555;
 }
+
 input {
   width: 100%;
   padding: 10px 12px;
@@ -87,6 +92,7 @@ input {
   font-size: 15px;
   box-sizing: border-box;
 }
+
 button {
   width: 100%;
   padding: 12px;
@@ -98,10 +104,12 @@ button {
   cursor: pointer;
   margin-top: 8px;
 }
+
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
+
 .error {
   color: #dc2626;
   font-size: 14px;
