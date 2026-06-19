@@ -1,0 +1,56 @@
+FROM php:8.2-cli
+
+# System dependencies
+RUN apt-get update && apt-get install -y \
+    curl git unzip sqlite3 libsqlite3-dev \
+    chromium fonts-liberation \
+    libasound2 libatk-bridge2.0-0 libatk1.0-0 \
+    libcups2 libdbus-1-3 libdrm2 libgbm1 \
+    libgtk-3-0 libnspr4 libnss3 \
+    libxcomposite1 libxdamage1 libxfixes3 libxrandr2 \
+    xdg-utils ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Node.js 20
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# PHP extensions
+RUN docker-php-ext-install pdo pdo_sqlite
+
+# Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /app
+COPY . .
+
+# Build frontend
+WORKDIR /app/frontend
+RUN npm ci && npm run build
+
+# Copy built frontend to Laravel public
+RUN cp -r dist/. /app/backend/public/
+
+# Install Laravel dependencies
+WORKDIR /app/backend
+RUN composer install --no-dev --optimize-autoloader
+
+# Install scraper dependencies (skip Playwright browser download — use system Chromium)
+WORKDIR /app/backend/scraper
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+RUN npm ci
+
+# Configure Laravel
+WORKDIR /app/backend
+RUN cp .env.example .env \
+    && php artisan key:generate \
+    && touch database/database.sqlite \
+    && php artisan migrate --force \
+    && php artisan db:seed --force
+
+ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium
+
+EXPOSE 8000
+
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
